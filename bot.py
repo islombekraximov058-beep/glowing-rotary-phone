@@ -9,13 +9,10 @@ TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.environ.get("CHAT_ID")
 
 def generate_script(prompt):
-    # To'g'rilangan va barqaror Gemini API manzili
-    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
     headers = {"Content-Type": "application/json"}
     data = {
-        "contents": [{
-            "parts": [{"text": prompt}]
-        }]
+        "contents": [{"parts": [{"text": prompt}]}]
     }
     
     response = requests.post(url, headers=headers, json=data)
@@ -24,12 +21,9 @@ def generate_script(prompt):
     
     if response.status_code == 200:
         res_json = response.json()
-        try:
-            return res_json['candidates'][0]['content']['parts'][0]['text']
-        except Exception as e:
-            return f"Javobni o'qishda xatolik: {e}"
+        return res_json['candidates'][0]['content']['parts'][0]['text']
     else:
-        return f"Gemini xatoligi: {response.text}"
+        raise Exception(f"Gemini xatoligi: {response.text}")
 
 def create_video():
     print("Video yaratilmoqda...")
@@ -46,8 +40,7 @@ def send_to_telegram():
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendVideo"
     
     if not os.path.exists("output.mp4"):
-        print("Xatolik: 'output.mp4' fayli topilmadi!")
-        return
+        raise Exception("Xatolik: 'output.mp4' fayli topilmadi!")
         
     with open("output.mp4", "rb") as video_file:
         files = {"video": video_file}
@@ -55,18 +48,15 @@ def send_to_telegram():
             "chat_id": CHAT_ID, 
             "caption": "🤖 YouTube Shorts videongiz tayyor!"
         }
-        try:
-            response = requests.post(url, data=data, files=files, timeout=60)
-            if response.status_code == 200:
-                print("Muvaffaqiyatli yuborildi!")
-            else:
-                print(f"Yuborishda xatolik kodi: {response.status_code} - {response.text}")
-        except Exception as e:
-            print(f"Tarmoq xatoligi yuz berdi: {e}")
+        response = requests.post(url, data=data, files=files, timeout=60)
+        print("Telegram javobi:", response.text)
+        if response.status_code != 200:
+            raise Exception(f"Telegramga yuborishda xatolik: {response.text}")
+        print("Muvaffaqiyatli yuborildi!")
 
 async def main():
-    print("1. Gemini orqali ssenariy yozilmoqda...")
-    prompt = "YouTube Shorts uchun 15 soniyali qiziqarli fakt yozib ber, o'zbek tilida, qisqa va tushunarli bolsin."
+    print("1. Ssenariy tayyorlanmoqda...")
+    prompt = "YouTube Shorts uchun 15 soniyali qiziqarli fakt yozib ber, o'zbek tilida."
     script = generate_script(prompt)
     print("\nYozilgan ssenariy:\n", script)
     
