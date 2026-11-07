@@ -1,0 +1,4 @@
+requests
+edge-tts
+moviepy
+google-generativeai
