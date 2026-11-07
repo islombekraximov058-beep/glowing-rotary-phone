@@ -19,7 +19,7 @@ def generate_script(prompt):
         res_json = response.json()
         return res_json['candidates'][0]['content']['parts'][0]['text']
     else:
-        return f"Xatolik: {response.text}"
+        return f"Gemini xatoligi: {response.text}"
 
 def create_video():
     print("Video yaratilmoqda...")
@@ -43,20 +43,21 @@ def send_to_telegram():
         files = {"video": video_file}
         data = {
             "chat_id": CHAT_ID, 
-            "caption": "🤖 Mana GitHub bulutida avtomatik tayyorlangan YouTube Shorts videongiz!"
+            "caption": "🤖 YouTube Shorts videongiz tayyor!"
         }
         try:
             response = requests.post(url, data=data, files=files, timeout=60)
+            print("Telegram javobi:", response.text)
             if response.status_code == 200:
                 print("Muvaffaqiyatli yuborildi!")
             else:
-                print(f"Yuborishda xatolik: {response.text}")
+                print(f"Yuborishda xatolik kodi: {response.status_code}")
         except Exception as e:
             print(f"Tarmoq xatoligi yuz berdi: {e}")
 
 async def main():
     print("1. Gemini orqali ssenariy yozilmoqda...")
-    prompt = "YouTube Shorts uchun qiziqarli, imlo qoidalariga to'liq amal qilingan, jadvallarsiz va faqat o'qiladigan matn ko'rinishidagi 30 soniyali ssenariy yozib ber, o'zbek tilida."
+    prompt = "YouTube Shorts uchun 15 soniyali qiziqarli fakt yozib ber, o'zbek tilida, qisqa va tushunarli bolsin."
     script = generate_script(prompt)
     print("\nYozilgan ssenariy:\n", script)
     
@@ -69,4 +70,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-
