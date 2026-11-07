@@ -12,8 +12,8 @@ def generate_script(prompt):
     if not GEMINI_API_KEY:
         raise Exception("GEMINI_API_KEY topilmadi!")
         
-    # v1beta emas, to'g'ridan-to'g'ri v1 va gemini-1.5-flash ishlatamiz
-    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+    # Model nomini api_key bilan birga to'g'ridan-to'g'ri so'raymiz
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={GEMINI_API_KEY}"
     headers = {"Content-Type": "application/json"}
     data = {
         "contents": [{"parts": [{"text": prompt}]}]
@@ -22,6 +22,7 @@ def generate_script(prompt):
     print("Gemini'ga so'rov yuborilmoqda...")
     response = requests.post(url, headers=headers, json=data)
     print("Javob kodi:", response.status_code)
+    print("Javob matni:", response.text)
     
     if response.status_code == 200:
         res_json = response.json()
