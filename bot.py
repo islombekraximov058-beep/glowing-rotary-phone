@@ -9,16 +9,25 @@ TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.environ.get("CHAT_ID")
 
 def generate_script(prompt):
-    # Model nomi gemini-1.5-flash ga o'zgartirildi
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+    # To'g'rilangan va barqaror Gemini API manzili
+    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
     headers = {"Content-Type": "application/json"}
     data = {
-        "contents": [{"parts": [{"text": prompt}]}]
+        "contents": [{
+            "parts": [{"text": prompt}]
+        }]
     }
+    
     response = requests.post(url, headers=headers, json=data)
+    print("Gemini javob kodi:", response.status_code)
+    print("Gemini javob matni:", response.text)
+    
     if response.status_code == 200:
         res_json = response.json()
-        return res_json['candidates'][0]['content']['parts'][0]['text']
+        try:
+            return res_json['candidates'][0]['content']['parts'][0]['text']
+        except Exception as e:
+            return f"Javobni o'qishda xatolik: {e}"
     else:
         return f"Gemini xatoligi: {response.text}"
 
@@ -48,11 +57,10 @@ def send_to_telegram():
         }
         try:
             response = requests.post(url, data=data, files=files, timeout=60)
-            print("Telegram javobi:", response.text)
             if response.status_code == 200:
                 print("Muvaffaqiyatli yuborildi!")
             else:
-                print(f"Yuborishda xatolik kodi: {response.status_code}")
+                print(f"Yuborishda xatolik kodi: {response.status_code} - {response.text}")
         except Exception as e:
             print(f"Tarmoq xatoligi yuz berdi: {e}")
 
@@ -71,4 +79,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-
