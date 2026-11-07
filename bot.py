@@ -17,7 +17,7 @@ def generate_script(prompt):
     genai.configure(api_key=GEMINI_API_KEY)
     
     # Eng barqaror va yangi modelni tanlaymiz
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-pro')
     
     print("Gemini'ga so'rov yuborilmoqda...")
     response = model.generate_content(prompt)
