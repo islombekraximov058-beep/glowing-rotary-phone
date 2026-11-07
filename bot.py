@@ -2,14 +2,14 @@ import os
 import asyncio
 import requests
 import edge_tts
-from moviepy.editor import AudioFileClip, ColorClip
+from moviepy import AudioFileClip, ColorClip
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.environ.get("CHAT_ID")
 
 def generate_script(prompt):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key={GEMINI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
     headers = {"Content-Type": "application/json"}
     data = {
         "contents": [{"parts": [{"text": prompt}]}]
@@ -27,7 +27,7 @@ def create_video():
     duration = audio_clip.duration
     
     video_clip = ColorClip(size=(1080, 1920), color=(15, 15, 30), duration=duration)
-    video_clip = video_clip.set_audio(audio_clip)
+    video_clip = video_clip.with_audio(audio_clip)
     video_clip.write_videofile("output.mp4", fps=24, codec="libx264", audio_codec="aac", logger=None)
     print("Video tayyor!")
 
@@ -69,3 +69,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
