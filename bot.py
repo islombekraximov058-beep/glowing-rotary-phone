@@ -3,7 +3,6 @@ import asyncio
 import requests
 import edge_tts
 from moviepy import AudioFileClip, ColorClip
-import google.generativeai as genai
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
@@ -12,21 +11,23 @@ CHAT_ID = os.environ.get("CHAT_ID")
 def generate_script(prompt):
     if not GEMINI_API_KEY:
         raise Exception("GEMINI_API_KEY topilmadi!")
-    
-    # Rasmiy Google kutubxonasi orqali ulanamiz
-    genai.configure(api_key=GEMINI_API_KEY)
-    
-    # Eng barqaror va yangi modelni tanlaymiz
-    model = genai.GenerativeModel('gemini-pro')
+        
+    # v1beta emas, to'g'ridan-to'g'ri v1 va gemini-1.5-flash ishlatamiz
+    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+    headers = {"Content-Type": "application/json"}
+    data = {
+        "contents": [{"parts": [{"text": prompt}]}]
+    }
     
     print("Gemini'ga so'rov yuborilmoqda...")
-    response = model.generate_content(prompt)
+    response = requests.post(url, headers=headers, json=data)
+    print("Javob kodi:", response.status_code)
     
-    if response and response.text:
-        print("Ssenariy muvaffaqiyatli olindi!")
-        return response.text
+    if response.status_code == 200:
+        res_json = response.json()
+        return res_json['candidates'][0]['content']['parts'][0]['text']
     else:
-        raise Exception("Gemini bo'sh javob qaytardi!")
+        raise Exception(f"Gemini xatoligi: {response.text}")
 
 def create_video():
     print("Video yaratilmoqda...")
