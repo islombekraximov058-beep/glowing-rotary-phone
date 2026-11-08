@@ -1,4 +1,4 @@
 requests
-edge-tts
-moviepy
-google-generativeai
+edge-tts>=7.0.0
+moviepy>=2.1
+Pillow
