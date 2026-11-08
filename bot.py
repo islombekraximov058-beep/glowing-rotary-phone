@@ -29,7 +29,7 @@ def generate_script(prompt):
         raise Exception(f"Gemini xatoligi: {response.text}")
 
 def download_background_video(query="technology"):
-    print(f"Pexels'dan '{query' bo'yicha video qidirilmoqda...")
+    print(f"Pexels'dan '{query}' bo'yicha video qidirilmoqda...")
     headers = {"Authorization": PEXELS_API_KEY}
     url = f"https://api.pexels.com/videos/search?query={query}&per_page=1&orientation=portrait"
     
