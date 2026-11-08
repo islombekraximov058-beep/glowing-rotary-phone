@@ -2,17 +2,21 @@ name: Run Bot Script
 
 on:
   schedule:
-    - cron: '0 12 * * *'
-    - cron: '0 20 * * *'
+    - cron: '0 12 * * *'   # 12:00 UTC (AQSh: ~08:00 ET)
+    - cron: '0 20 * * *'   # 20:00 UTC (AQSh: ~16:00 ET)
   workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: shorts-bot
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     steps:
       - name: Checkout code
@@ -39,7 +43,12 @@ jobs:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
-        run: python bot.py
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          YT_PRIVACY: ${{ vars.YT_PRIVACY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+        run: python -u bot.py
 
       - name: Save history
         if: success()
