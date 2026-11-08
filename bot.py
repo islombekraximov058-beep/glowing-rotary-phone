@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import random
 import asyncio
 import requests
@@ -26,6 +27,13 @@ PEXELS_API_KEY = get_env("PEXELS_API_KEY")
 
 # Model nomini kerak bo'lsa GitHub Variables / env orqali almashtirasiz
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
+GEMINI_MODELS = [GEMINI_MODEL] + [
+    m.strip()
+    for m in os.environ.get(
+        "GEMINI_FALLBACK_MODELS", "gemini-2.5-flash,gemini-2.5-flash-lite"
+    ).split(",")
+    if m.strip()
+]
 VOICE = os.environ.get("VOICE", "en-US-AndrewNeural")
 FONT_PATH = os.environ.get(
     "FONT_PATH", "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
@@ -74,10 +82,6 @@ Script rules:
 
 Do NOT repeat any of these recent titles or topics: {recent}
 """
-    url = (
-        "https://generativelanguage.googleapis.com/v1beta/models/"
-        f"{GEMINI_MODEL}:generateContent"
-    )
     headers = {"Content-Type": "application/json", "x-goog-api-key": GEMINI_API_KEY}
     body = {
         "contents": [{"parts": [{"text": prompt}]}],
@@ -85,22 +89,28 @@ Do NOT repeat any of these recent titles or topics: {recent}
     }
 
     last_error = None
-    for attempt in range(3):
-        try:
-            print(f"Gemini'ga so'rov yuborilmoqda... (urinish {attempt + 1})")
-            r = requests.post(url, headers=headers, json=body, timeout=60)
-            if r.status_code != 200:
-                raise Exception(f"Gemini xatoligi: {r.status_code} {r.text[:300]}")
-            text = r.json()["candidates"][0]["content"]["parts"][0]["text"]
-            text = text.strip().removeprefix("```json").removesuffix("```").strip()
-            content = json.loads(text)
-            for key in ("title", "script", "keywords", "description", "hashtags"):
-                if key not in content:
-                    raise Exception(f"JSON'da '{key}' yo'q")
-            return content
-        except Exception as e:
-            last_error = e
-            print("Xato:", e)
+    for round_no in range(3):
+        for model in GEMINI_MODELS:
+            url = (
+                "https://generativelanguage.googleapis.com/v1beta/models/"
+                f"{model}:generateContent"
+            )
+            try:
+                print(f"Gemini ({model}) so'rov... (urinish {round_no + 1})")
+                r = requests.post(url, headers=headers, json=body, timeout=60)
+                if r.status_code != 200:
+                    raise Exception(f"{model}: {r.status_code} {r.text[:200]}")
+                text = r.json()["candidates"][0]["content"]["parts"][0]["text"]
+                text = text.strip().removeprefix("```json").removesuffix("```").strip()
+                content = json.loads(text)
+                for key in ("title", "script", "keywords", "description", "hashtags"):
+                    if key not in content:
+                        raise Exception(f"JSON'da '{key}' yo'q")
+                return content
+            except Exception as e:
+                last_error = e
+                print("Xato:", e)
+        time.sleep(15 * (round_no + 1))
     raise Exception(f"Ssenariy olinmadi: {last_error}")
 
 
