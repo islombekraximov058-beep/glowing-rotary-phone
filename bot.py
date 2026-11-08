@@ -95,4 +95,4 @@ def next_queued_fact(history):
         print("facts.json o'qilmadi:", e)
         return None, 0
 
-    used = {h.get("title") for h
+        used = {h.get("title") for h in history}
