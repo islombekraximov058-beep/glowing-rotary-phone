@@ -12,11 +12,17 @@ from moviepy import (
     concatenate_videoclips,
 )
 
+
 # ---------- Sozlamalar ----------
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
-CHAT_ID = os.environ.get("CHAT_ID")
-PEXELS_API_KEY = os.environ.get("PEXELS_API_KEY")
+def get_env(name):
+    value = os.environ.get(name)
+    return value.strip() if value else None
+
+
+GEMINI_API_KEY = get_env("GEMINI_API_KEY")
+TELEGRAM_BOT_TOKEN = get_env("TELEGRAM_BOT_TOKEN")
+CHAT_ID = get_env("CHAT_ID")
+PEXELS_API_KEY = get_env("PEXELS_API_KEY")
 
 # Model nomini kerak bo'lsa GitHub Variables / env orqali almashtirasiz
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
