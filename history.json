@@ -8,5 +8,10 @@
     "title": "Venus Spins Slower Than It Orbits",
     "script": "Venus spins so slowly that one rotation takes longer than its entire year. A single spin takes about 243 Earth days. Its trip around the Sun takes only about 225. It also spins backwards, so the Sun rises in the west. Sunrise to sunrise takes about 117 Earth days. On Venus, a year ends before the planet finishes even one spin.",
     "origin": "queue"
+  },
+  {
+    "title": "Lightning Is Hotter Than the Sun's Surface",
+    "script": "A bolt of lightning is hotter than the surface of the Sun. The Sun's surface is around 5,500 degrees Celsius. Lightning can reach roughly 30,000 degrees Celsius, about five times hotter. It heats the air so fast that the air explodes outward. That sudden expansion is the sound we call thunder. So thunder is really the sound of air being blasted apart.",
+    "origin": "queue"
   }
 ]
