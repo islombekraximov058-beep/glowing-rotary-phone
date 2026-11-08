@@ -288,8 +288,10 @@ def build_subtitles(words, words_per_group=3):
 # ---------- 5. Montaj ----------
 def create_video(words, bg_paths, mp3_path="output.mp3", out_path="output.mp4"):
     print("Video render qilinmoqda...")
-    audio = AudioFileClip(mp3_path)
-    duration = audio.duration + 0.3
+        audio = AudioFileClip(mp3_path)
+    # mp3 davomiyligi ba'zan sal noaniq bo'ladi; oxiridan biroz qisqartiramiz
+    duration = max(audio.duration - 0.1, 1.0)
+    audio = audio.subclipped(0, duration)
 
     bg = build_background(bg_paths, duration)
     subs = build_subtitles(words)
